@@ -26,15 +26,11 @@ public class ProductController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponseDto> getProduct(@PathVariable("id") Long productId) {
-        try {
             if (productId <= 0)
                 throw new IllegalArgumentException("Invalid product id");
             Product product = fakeStoreProductService.getProductById(productId);
             ProductResponseDto body = getProductResponseDto(product);
             return new ResponseEntity<>(body, HttpStatus.OK);
-        }catch (IllegalArgumentException e){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
     }
 
     @GetMapping
