@@ -1,0 +1,17 @@
+meta {
+  name: update_product_by_id
+  type: http
+  seq: 7
+}
+
+put {
+  url: http://localhost:8080/products/1
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Mens Casual Premium Slim Fit T-Shirts "
+  }
+}
