@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class FakeStoreProductService implements IFakeStoreProductService{
+public class FakeStoreProductService implements IProductService {
 
     private final FakeStoreClient fakeStoreClient;
 
@@ -79,12 +79,15 @@ public class FakeStoreProductService implements IFakeStoreProductService{
         });
 
         Optional.ofNullable(fakeStoreProductResponseDto.getRating())
-                .ifPresent(ratingDto -> {
-            Rating rating = new Rating();
-            Optional.ofNullable(ratingDto.getRate()).ifPresent(rating::setRate);
-            Optional.ofNullable(ratingDto.getCount()).ifPresent(rating::setCount);
-            product.setRating(rating);
-        });
+                .ifPresent(fakeStoreRatingDtos -> {
+                    List<Rating> ratings = new LinkedList<>();
+                    for(FakeStoreRatingDto fakeStoreRatingDto : fakeStoreRatingDtos) {
+                        Rating rating = new Rating();
+                        Optional.ofNullable(fakeStoreRatingDto.getRate()).ifPresent(rating::setRate);
+                        ratings.add(rating);
+                    }
+                    product.setRating(ratings);
+                });
 
         return product;
     }

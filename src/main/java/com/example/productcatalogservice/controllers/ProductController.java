@@ -3,7 +3,8 @@ package com.example.productcatalogservice.controllers;
 import com.example.productcatalogservice.dtos.*;
 import com.example.productcatalogservice.models.Category;
 import com.example.productcatalogservice.models.Product;
-import com.example.productcatalogservice.services.IFakeStoreProductService;
+import com.example.productcatalogservice.models.Rating;
+import com.example.productcatalogservice.services.IProductService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,10 +18,10 @@ import java.util.Optional;
 public class ProductController {
 
 
-    private final IFakeStoreProductService fakeStoreProductService;
+    private final IProductService productService;
 
-    public ProductController(IFakeStoreProductService fakeStoreProductService) {
-        this.fakeStoreProductService = fakeStoreProductService;
+    public ProductController(IProductService productService) {
+        this.productService = productService;
     }
 
 
@@ -28,14 +29,14 @@ public class ProductController {
     public ResponseEntity<ProductResponseDto> getProduct(@PathVariable("id") Long productId) {
             if (productId <= 0)
                 throw new IllegalArgumentException("Invalid product id");
-            Product product = fakeStoreProductService.getProductById(productId);
+            Product product = productService.getProductById(productId);
             ProductResponseDto body = getProductResponseDto(product);
             return new ResponseEntity<>(body, HttpStatus.OK);
     }
 
     @GetMapping
     public ResponseEntity<List<ProductResponseDto>> getAllProducts(){
-        List<Product> products = fakeStoreProductService.getAllProducts();
+        List<Product> products = productService.getAllProducts();
         List<ProductResponseDto> body = new LinkedList<>();
         for(Product product : products){
             body.add(getProductResponseDto(product));
@@ -45,7 +46,7 @@ public class ProductController {
 
     @PostMapping
     public ResponseEntity<ProductResponseDto> addProduct(@RequestBody ProductRequestDto productRequestDto) {
-        Product product = fakeStoreProductService.addProduct(getProduct(productRequestDto));
+        Product product = productService.addProduct(getProduct(productRequestDto));
         ProductResponseDto body = getProductResponseDto(product);
         return new ResponseEntity<>(body, HttpStatus.OK);
     }
@@ -53,14 +54,14 @@ public class ProductController {
     @PutMapping("/{id}")
     public ResponseEntity<ProductResponseDto> updateProduct(@RequestBody ProductRequestDto productRequestDto,
             @PathVariable("id") Long productId){
-        Product product = fakeStoreProductService.updateProduct(getProduct(productRequestDto) ,productId);
+        Product product = productService.updateProduct(getProduct(productRequestDto) ,productId);
         ProductResponseDto body = getProductResponseDto(product);
         return new ResponseEntity<>(body, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ProductResponseDto>  removeProduct(@PathVariable("id") Long productId){
-        Product product = fakeStoreProductService.deleteProduct(productId);
+        Product product = productService.deleteProduct(productId);
         ProductResponseDto body = getProductResponseDto(product);
         return new ResponseEntity<>(body, HttpStatus.OK);
     }
@@ -76,15 +77,19 @@ public class ProductController {
 
         Optional.ofNullable(product.getCategory()).ifPresent(category -> {
             CategoryResponseDto categoryResponseDto = new CategoryResponseDto();
+            Optional.ofNullable(category.getId()).ifPresent(categoryResponseDto::setId);
             Optional.ofNullable(category.getName()).ifPresent(categoryResponseDto::setName);
             productResponseDto.setCategory(categoryResponseDto);
         });
 
-        Optional.ofNullable(product.getRating()).ifPresent(rating -> {
-            RatingResponseDto ratingResponseDto = new RatingResponseDto();
-            Optional.ofNullable(rating.getRate()).ifPresent(ratingResponseDto::setRate);
-            Optional.ofNullable(rating.getCount()).ifPresent(ratingResponseDto::setCount);
-            productResponseDto.setRating(ratingResponseDto);
+        Optional.ofNullable(product.getRating()).ifPresent(ratings -> {
+            List<RatingResponseDto> ratingResponseDtoList = new LinkedList<>();
+            for(Rating rating : ratings){
+                RatingResponseDto ratingResponseDto = new RatingResponseDto();
+                Optional.ofNullable(rating.getRate()).ifPresent(ratingResponseDto::setRate);
+                ratingResponseDtoList.add(ratingResponseDto);
+            }
+            productResponseDto.setRating(ratingResponseDtoList);
         });
 
         return productResponseDto;

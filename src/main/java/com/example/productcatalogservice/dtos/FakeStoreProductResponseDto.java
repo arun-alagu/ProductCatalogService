@@ -3,6 +3,8 @@ package com.example.productcatalogservice.dtos;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 public class FakeStoreProductResponseDto {
@@ -12,5 +14,5 @@ public class FakeStoreProductResponseDto {
     private String description;
     private String category;
     private String image;
-    private FakeStoreRatingDto rating;
+    private List<FakeStoreRatingDto> rating;
 }

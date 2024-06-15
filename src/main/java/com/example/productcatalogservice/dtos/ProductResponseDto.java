@@ -3,6 +3,8 @@ package com.example.productcatalogservice.dtos;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 public class ProductResponseDto {
@@ -12,5 +14,5 @@ public class ProductResponseDto {
     private Double price;
     private String imageUrl;
     private CategoryResponseDto category;
-    private RatingResponseDto rating;
+    private List<RatingResponseDto> rating;
 }

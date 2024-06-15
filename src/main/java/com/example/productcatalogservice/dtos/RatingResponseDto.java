@@ -7,5 +7,4 @@ import lombok.Setter;
 @Setter
 public class RatingResponseDto {
     private Float rate;
-    private Integer count;
 }
