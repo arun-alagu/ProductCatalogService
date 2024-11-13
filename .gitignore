@@ -34,3 +34,4 @@ build/
 
 ### ENV ###
 src/main/resources/env.properties
+*.env

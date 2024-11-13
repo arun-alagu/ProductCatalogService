@@ -8,6 +8,7 @@ import com.example.productcatalogservice.services.IProductService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -20,7 +21,7 @@ public class ProductController {
 
     private final IProductService productService;
 
-    public ProductController(IProductService productService) {
+    public ProductController (@Qualifier("StorageProductService") IProductService productService) {
         this.productService = productService;
     }
 
