@@ -8,13 +8,13 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
-@Service(value = "StorageProductService")
+@Service(value = "SelfProductService")
 @Primary
-public class StorageProductService implements  IProductService {
+public class SelfProductService implements  IProductService {
 
     private final ProductRepository productRepository;
 
-    public StorageProductService(ProductRepository productRepository) {
+    public SelfProductService(ProductRepository productRepository) {
         this.productRepository = productRepository;
     }
 
@@ -38,7 +38,7 @@ public class StorageProductService implements  IProductService {
     public Product updateProduct(Product product, Long productId) {
         Product updatedProduct = getProductById(productId);
 
-        Optional.ofNullable(product.getName()).ifPresent(updatedProduct::setName);
+        Optional.ofNullable(product.getTitle()).ifPresent(updatedProduct::setTitle);
         Optional.ofNullable(product.getDescription()).ifPresent(updatedProduct::setDescription);
         Optional.ofNullable(product.getPrice()).ifPresent(updatedProduct::setPrice);
         Optional.ofNullable(product.getImageUrl()).ifPresent(updatedProduct::setImageUrl);

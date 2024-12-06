@@ -63,7 +63,7 @@ public class FakeStoreProductService implements IProductService {
         Optional.ofNullable(fakeStoreProductResponseDto.getId())
                 .ifPresent(product::setId);
         Optional.ofNullable(fakeStoreProductResponseDto.getTitle())
-                .ifPresent(product::setName);
+                .ifPresent(product::setTitle);
         Optional.ofNullable(fakeStoreProductResponseDto.getPrice())
                 .ifPresent(product::setPrice);
         Optional.ofNullable(fakeStoreProductResponseDto.getDescription())
@@ -96,7 +96,7 @@ public class FakeStoreProductService implements IProductService {
     private FakeStoreProductRequestDto getFakeStoreProductRequestDto(Product product) {
         FakeStoreProductRequestDto fakeStoreProductRequestDto =
                 new FakeStoreProductRequestDto();
-        Optional.ofNullable(product.getName())
+        Optional.ofNullable(product.getTitle())
                 .ifPresent(fakeStoreProductRequestDto::setTitle);
         Optional.ofNullable(product.getDescription())
                 .ifPresent(fakeStoreProductRequestDto::setDescription);

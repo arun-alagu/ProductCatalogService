@@ -13,7 +13,7 @@ import java.util.List;
 @Setter
 @Entity
 public class Product extends BaseModel{
-    private String name;
+    private String title;
     private String description;
     private Double price;
     private String imageUrl;
