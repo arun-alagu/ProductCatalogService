@@ -6,6 +6,8 @@ import com.example.productcatalogservice.models.Category;
 import com.example.productcatalogservice.models.Product;
 import com.example.productcatalogservice.models.Rating;
 
+import com.example.productcatalogservice.repositories.ProductRepository;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
@@ -16,29 +18,47 @@ import java.util.Optional;
 public class FakeStoreProductService implements IProductService {
 
     private final FakeStoreClient fakeStoreClient;
+    private final RedisTemplate<String, Object> redisTemplateObject;
+    private final RedisTemplate<String, List<Object>> redisTemplateObjects;
 
-    public FakeStoreProductService(FakeStoreClient fakeStoreClient) {
+    public FakeStoreProductService(FakeStoreClient fakeStoreClient, RedisTemplate<String, Object> redisTemplate,
+                                   RedisTemplate<String, List<Object>> redisTemplateObjects) {
         this.fakeStoreClient = fakeStoreClient;
+        this.redisTemplateObject = redisTemplate;
+        this.redisTemplateObjects = redisTemplateObjects;
     }
 
     @Override
     public List<Product> getAllProducts() {
+        List<Product> products = (List<Product>) redisTemplateObjects.opsForHash().get("PRODUCTS", "PRODUCTS_");
+        if (products != null && !products.isEmpty()) {
+            return products;
+        }
         FakeStoreProductResponseDto[] fakeStoreProductResponseDtos =
                 fakeStoreClient.getAllProducts();
-
-        List<Product> products = new LinkedList<>();
-        if(fakeStoreProductResponseDtos != null) {
-            for (FakeStoreProductResponseDto fakeStoreProductResponseDto :
-                    fakeStoreProductResponseDtos) {
-                products.add(getProduct(fakeStoreProductResponseDto));
-            }
+        if (fakeStoreProductResponseDtos == null) throw new RuntimeException("Products not found");
+        products = new LinkedList<>();
+        for (FakeStoreProductResponseDto fakeStoreProductResponseDto :
+                fakeStoreProductResponseDtos) {
+            products.add(getProduct(fakeStoreProductResponseDto));
         }
+
+        redisTemplateObjects.opsForHash().put("PRODUCTS", "PRODUCTS_", products);
         return products;
     }
 
     @Override
     public Product getProductById(Long productId) {
-        return getProduct(fakeStoreClient.getProduct(productId));
+//        return getProduct(fakeStoreClient.getProduct(productId));
+        Product product = (Product) redisTemplateObject.opsForHash().get("PRODUCT", "PRODUCT_" +productId);
+        if (product != null) {
+            return product;
+        }
+        FakeStoreProductResponseDto fakeStoreProductResponseDto = fakeStoreClient.getProduct(productId);
+        if (fakeStoreProductResponseDto == null) throw new RuntimeException("Product not found");
+        product = getProduct(fakeStoreProductResponseDto);
+        redisTemplateObject.opsForHash().put("PRODUCT", "PRODUCT_" + productId, product);
+        return product;
     }
 
     @Override
@@ -48,13 +68,13 @@ public class FakeStoreProductService implements IProductService {
     }
 
     @Override
-    public Product updateProduct(Product product, Long productId) {
+    public Product updateProductById(Product product, Long productId) {
         return getProduct(fakeStoreClient
                 .updateProduct(getFakeStoreProductRequestDto(product),productId));
     }
 
     @Override
-    public Product deleteProduct(Long productId) {
+    public Product deleteProductById(Long productId) {
         return getProduct(fakeStoreClient.deleteProduct(productId));
     }
 
@@ -79,14 +99,11 @@ public class FakeStoreProductService implements IProductService {
         });
 
         Optional.ofNullable(fakeStoreProductResponseDto.getRating())
-                .ifPresent(fakeStoreRatingDtos -> {
-                    List<Rating> ratings = new LinkedList<>();
-                    for(FakeStoreRatingDto fakeStoreRatingDto : fakeStoreRatingDtos) {
+                .ifPresent(fakeStoreRatingDto -> {
                         Rating rating = new Rating();
                         Optional.ofNullable(fakeStoreRatingDto.getRate()).ifPresent(rating::setRate);
-                        ratings.add(rating);
-                    }
-                    product.setRating(ratings);
+                        Optional.ofNullable(fakeStoreRatingDto.getCount()).ifPresent(rating::setCount);
+                    product.setRating(rating);
                 });
 
         return product;

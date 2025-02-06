@@ -1,0 +1,111 @@
+package com.example.productcatalogservice.controllers;
+
+import com.example.productcatalogservice.dtos.ProductResponseDto;
+import com.example.productcatalogservice.models.Product;
+import com.example.productcatalogservice.services.IProductSearchService;
+import io.github.cdimascio.dotenv.Dotenv;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
+
+@SpringBootTest
+class SearchControllerTest {
+    @BeforeAll
+    public static void setup() { // Load .env file before tests run
+        Dotenv dotenv = Dotenv.configure().load(); // This will load the .env file
+        System.setProperty("DB_URL", dotenv.get("DB_URL"));
+        System.setProperty("DB_NAME", dotenv.get("DB_NAME"));
+        System.setProperty("DB_USERNAME", dotenv.get("DB_USERNAME"));
+        System.setProperty("DB_PASSWORD", dotenv.get("DB_PASSWORD"));
+    }
+
+    @Autowired
+    private SearchController searchController;
+
+    @Mock
+    private RestTemplate restTemplate;
+
+    @MockBean
+    private IProductSearchService productSearchService;
+
+    @Test
+    void whenValidProductSearchRequest_thenReturnProducts() {
+        Product product1 = new Product();
+        product1.setId(1L);
+        product1.setTitle("Product 1");
+
+        Product product2 = new Product();
+        product2.setId(2L);
+        product2.setTitle("Product 2");
+
+        List<Product> products = List.of(product1, product2);
+        when(productSearchService.searchProducts("Product", 0, 1))
+        .thenReturn(products);
+
+        ResponseEntity<List<ProductResponseDto>> productResponseDtos = searchController.search(
+                "Product", 0, 1);
+
+        Assertions.assertNotNull(products);
+        Assertions.assertNotNull(productResponseDtos.getBody());
+        Assertions.assertEquals(products.size(), productResponseDtos.getBody().size());
+        Assertions.assertEquals(2, products.size());
+        Assertions.assertEquals(products.get(0).getTitle(),
+                productResponseDtos.getBody().get(0).getTitle());
+
+    }
+
+    @Test
+    void whenGETSearchRequest_thenReturnProducts() {
+        Product product1 = new Product();
+        product1.setId(1L);
+        product1.setTitle("Product 1");
+        Product product2 = new Product();
+        product2.setId(2L);
+        product2.setTitle("Product 2");
+        List<Product> products = List.of(product1, product2);
+        when(productSearchService.searchProducts("Product", 0, 1))
+        .thenReturn(products);
+
+        ResponseEntity<List<ProductResponseDto>> productResponseDtos = searchController.search(
+                "Product", 0, 1
+        );
+       when(restTemplate.getForEntity("http://localhost:8080/search?keyword=Product",
+               ProductResponseDtoList.class))
+               .thenReturn(new ResponseEntity<>(
+                       new ProductResponseDtoList(
+                              productResponseDtos
+                               .getBody()), HttpStatus.OK)
+               );
+
+        ResponseEntity<ProductResponseDtoList> productResponseDtoList =
+        restTemplate.getForEntity("http://localhost:8080/search?keyword=Product",
+                ProductResponseDtoList.class);
+
+        Assertions.assertNotNull(productResponseDtoList.getBody());
+        Assertions.assertEquals(products.size(), productResponseDtoList.getBody().size());
+        Assertions.assertEquals(products.get(0).getTitle(),
+                productResponseDtoList.getBody().get(0).getTitle());
+
+
+    }
+
+    static class ProductResponseDtoList extends ArrayList<ProductResponseDto> {
+
+        public ProductResponseDtoList(List<ProductResponseDto> body) {
+            this.addAll(body);
+        }
+    }
+}

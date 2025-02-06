@@ -11,6 +11,7 @@ import lombok.Setter;
 @Entity
 public class Rating extends BaseModel{
     private Float rate;
-    @ManyToOne
+    private Integer count;
+    @OneToOne
     private Product product;
 }

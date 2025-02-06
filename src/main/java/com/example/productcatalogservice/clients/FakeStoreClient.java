@@ -8,10 +8,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RequestCallback;
-import org.springframework.web.client.ResponseExtractor;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.*;
 
 @Component
 public class FakeStoreClient {
@@ -57,15 +54,48 @@ public class FakeStoreClient {
     }
 
 
+//    private <T> ResponseEntity<T> responseForEntity(
+//            HttpMethod httpMethod, String url,
+//            @Nullable Object request, Class<T> responseType,
+//            Object... uriVariables) throws RestClientException {
+//        RequestCallback requestCallback = restTemplate.httpEntityCallback(request, responseType);
+//        ResponseExtractor<ResponseEntity<T>> responseExtractor = restTemplate.
+//                responseEntityExtractor(responseType);
+//        return restTemplate.execute(url, httpMethod, requestCallback,
+//                responseExtractor, uriVariables);
+//    }
+
     private <T> ResponseEntity<T> responseForEntity(
             HttpMethod httpMethod, String url,
             @Nullable Object request, Class<T> responseType,
             Object... uriVariables) throws RestClientException {
-        RequestCallback requestCallback = restTemplate.httpEntityCallback(request, responseType);
-        ResponseExtractor<ResponseEntity<T>> responseExtractor = restTemplate.
-                responseEntityExtractor(responseType);
-        return restTemplate.execute(url, httpMethod, requestCallback,
-                responseExtractor, uriVariables);
+        try {
+            // Create request callback
+            RequestCallback requestCallback = restTemplate.httpEntityCallback(request, responseType);
+
+            // Create response extractor
+            ResponseExtractor<ResponseEntity<T>> responseExtractor = restTemplate.responseEntityExtractor(responseType);
+
+            // Execute the request
+            ResponseEntity<T> response = restTemplate.execute(url, httpMethod, requestCallback, responseExtractor, uriVariables);
+
+            // Log the response status
+            System.out.println("Response Status: " + response.getStatusCode());
+
+            return response;
+        } catch (HttpClientErrorException e) {
+            // Handle 4xx errors
+            System.err.println("Client error: " + e.getStatusCode() + " - " + e.getResponseBodyAsString());
+            throw e;
+        } catch (HttpServerErrorException e) {
+            // Handle 5xx errors
+            System.err.println("Server error: " + e.getStatusCode() + " - " + e.getResponseBodyAsString());
+            throw e;
+        } catch (RestClientException e) {
+            // Handle other RestTemplate errors
+            System.err.println("RestClient error: " + e.getMessage());
+            throw e;
+        }
     }
 
 

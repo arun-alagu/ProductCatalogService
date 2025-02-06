@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service(value = "SelfCategoryService")
-public class SelfCategotyService implements ICategoryService {
+public class SelfCategoryService implements ICategoryService {
     @Override
     public List<Category> getAllCategories() {
         return List.of();

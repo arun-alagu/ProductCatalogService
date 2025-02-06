@@ -18,7 +18,7 @@ public class ProductResponseDto {
     private Double price;
     private String imageUrl;
     private CategoryResponseDto category;
-    private List<RatingResponseDto> rating;
+    private RatingResponseDto rating;
 
     public static ProductResponseDto getProductResponseDto(Product product){
         ProductResponseDto productResponseDto = new ProductResponseDto();
@@ -36,14 +36,11 @@ public class ProductResponseDto {
             productResponseDto.setCategory(categoryResponseDto);
         });
 
-        Optional.ofNullable(product.getRating()).ifPresent(ratings -> {
-            List<RatingResponseDto> ratingResponseDtoList = new LinkedList<>();
-            for(Rating rating : ratings){
+        Optional.ofNullable(product.getRating()).ifPresent(rating -> {
                 RatingResponseDto ratingResponseDto = new RatingResponseDto();
                 Optional.ofNullable(rating.getRate()).ifPresent(ratingResponseDto::setRate);
-                ratingResponseDtoList.add(ratingResponseDto);
-            }
-            productResponseDto.setRating(ratingResponseDtoList);
+                Optional.ofNullable(rating.getCount()).ifPresent(ratingResponseDto::setCount);
+            productResponseDto.setRating(ratingResponseDto);
         });
 
         return productResponseDto;
