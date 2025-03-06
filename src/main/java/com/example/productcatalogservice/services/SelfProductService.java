@@ -1,18 +1,15 @@
 package com.example.productcatalogservice.services;
 
-import com.example.productcatalogservice.dtos.FakeStoreProductResponseDto;
-import com.example.productcatalogservice.dtos.ProductResponseDto;
 import com.example.productcatalogservice.exceptions.ProductNotFoundException;
+import com.example.productcatalogservice.exceptions.RatingNotFoundException;
 import com.example.productcatalogservice.models.Product;
+import com.example.productcatalogservice.models.Rating;
 import com.example.productcatalogservice.repositories.ProductRepository;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -22,11 +19,16 @@ import java.util.concurrent.TimeUnit;
 public class SelfProductService implements  IProductService {
 
     private final ProductRepository productRepository;
+    private final IRatingService ratingService;
     private final RedisTemplate<String, Object> redisTemplateObject;
     private final RedisTemplate<String, List<Object>> redisTemplateObjects;
 
-    public SelfProductService(ProductRepository productRepository, RedisTemplate<String, Object> redisTemplateObject, RedisTemplate<String, List<Object>> redisTemplateObjects) {
+    public SelfProductService(ProductRepository productRepository, 
+    		RedisTemplate<String, Object> redisTemplateObject, 
+    		RedisTemplate<String, List<Object>> redisTemplateObjects,
+    		IRatingService ratingService) {
         this.productRepository = productRepository;
+		this.ratingService = ratingService;
         this.redisTemplateObject = redisTemplateObject;
         this.redisTemplateObjects = redisTemplateObjects;
     }
@@ -51,7 +53,7 @@ public class SelfProductService implements  IProductService {
         if (product != null) return product;
 
         product = productRepository.findById(productId)
-                .orElseThrow(()-> new ProductNotFoundException(productId ,"Product not found"));
+                .orElseThrow(()-> new ProductNotFoundException("Product with"+productId+" not found"));
         redisTemplateObject.expire("PRODUCT", 30, TimeUnit.SECONDS);
         redisTemplateObject.opsForHash().put("PRODUCT", "PRODUCT_" + productId, product);
         return product;
@@ -60,8 +62,14 @@ public class SelfProductService implements  IProductService {
     @Override
     public Product addProduct(Product product) throws ProductNotFoundException {
         if(product == null) throw new IllegalArgumentException("Product cannot be null");
+        if(product.getRating() == null) product.setRating(new Rating());
+        try {
+        ratingService.addRating(product.getRating());
+        } catch (RatingNotFoundException e) {
+        	throw new ProductNotFoundException(e.getMessage()+", Product not added");
+        }
         return Optional.of(productRepository.save(product)).orElseThrow(
-                ()-> new ProductNotFoundException(product.getId(),"Product not found")
+                ()-> new ProductNotFoundException("Product not added")
         );
     }
 
@@ -74,12 +82,15 @@ public class SelfProductService implements  IProductService {
         Optional.ofNullable(product.getDescription()).ifPresent(updatedProduct::setDescription);
         Optional.ofNullable(product.getPrice()).ifPresent(updatedProduct::setPrice);
         Optional.ofNullable(product.getImageUrl()).ifPresent(updatedProduct::setImageUrl);
-        Optional.ofNullable(product.getCategory()).ifPresent(updatedProduct::setCategory);
+        Optional.ofNullable(product.getCategories()).ifPresent(categories -> {
+        	categories.forEach(updatedProduct.getCategories()::add);
+        });
         Optional.ofNullable(product.getRating()).ifPresent(updatedProduct::setRating);
-
-        return Optional.of(productRepository.save(updatedProduct)).orElseThrow(
-                ()-> new ProductNotFoundException(productId, "Product not found")
-        );
+        
+        return addProduct(updatedProduct);
+//        return Optional.of(productRepository.save(updatedProduct)).orElseThrow(
+//                ()-> new ProductNotFoundException("Product not found")
+//        );
     }
 
     @Override
@@ -88,4 +99,13 @@ public class SelfProductService implements  IProductService {
         productRepository.deleteById(productId);
         return deletedProduct;
     }
+
+	@Override
+	public List<Product> addProducts(List<Product> products) throws ProductNotFoundException {
+		List<Product> addedProducts = new ArrayList<>();
+		for(Product product : products) {
+			addedProducts.add(addProduct(product));
+		}
+		return addedProducts;
+	}
 }

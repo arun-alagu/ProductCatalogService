@@ -9,7 +9,6 @@ import com.example.productcatalogservice.models.Product;
 import com.example.productcatalogservice.models.Rating;
 import com.example.productcatalogservice.models.State;
 import com.example.productcatalogservice.services.IProductService;
-import io.github.cdimascio.dotenv.Dotenv;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -23,8 +22,10 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -32,11 +33,11 @@ class ProductControllerTest {
 
     @BeforeAll
     public static void setup() { // Load .env file before tests run
-        Dotenv dotenv = Dotenv.configure().load(); // This will load the .env file
-        System.setProperty("DB_URL", dotenv.get("DB_URL"));
-        System.setProperty("DB_NAME", dotenv.get("DB_NAME"));
-        System.setProperty("DB_USERNAME", dotenv.get("DB_USERNAME"));
-        System.setProperty("DB_PASSWORD", dotenv.get("DB_PASSWORD"));
+//        Dotenv dotenv = Dotenv.configure().load(); // This will load the .env file
+//        System.setProperty("DB_URL", dotenv.get("DB_URL"));
+//        System.setProperty("DB_NAME", dotenv.get("DB_NAME"));
+//        System.setProperty("DB_USERNAME", dotenv.get("DB_USERNAME"));
+//        System.setProperty("DB_PASSWORD", dotenv.get("DB_PASSWORD"));
     }
     @Autowired
     private ProductController productController;
@@ -63,13 +64,13 @@ class ProductControllerTest {
         product.setId(1L);
         product.setTitle("Test Product");
         product.setDescription("Test Product Description");
-        product.setCategory(category);
+        product.getCategories().add(category);
         product.setState(State.ACTIVE);
-        product.setRating(new ArrayList<>(List.of(rating1, rating2)));
+//        product.setRating(new ArrayList<>(List.of(rating1, rating2)));
 
-        category.setProducts(List.of(product));
-        rating1.setProduct(product);
-        rating2.setProduct(product);
+        category.setProducts((Set<Product>) List.of(product));
+//        rating1.setProduct(product);
+//        rating2.setProduct(product);
 
         when(productService.getProductById(1L)).thenReturn(product);
 
@@ -82,8 +83,8 @@ class ProductControllerTest {
         Assertions.assertEquals("Test Product", response.getBody().getTitle());
         Assertions.assertEquals("Test Product Description", response.getBody().getDescription());
         Assertions.assertEquals(1L, response.getBody().getId());
-        Assertions.assertEquals(2, response.getBody().getRating().size());
-        Assertions.assertEquals("Test Category", response.getBody().getCategory().getName());
+//        Assertions.assertEquals(2, response.getBody().getRating().size());
+        Assertions.assertEquals("Test Category", response.getBody().getCategories().get(0).getName());
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
 
     }
@@ -126,7 +127,7 @@ class ProductControllerTest {
         Assertions.assertNotNull(response);
         Assertions.assertNotNull(response.getBody());
         Assertions.assertEquals(products.size(), response.getBody().size());
-        Assertions.assertEquals("test title1",response.getBody().get(0).getTitle());
+        Assertions.assertEquals("test title1",response.getBody().getFirst().getTitle());
         Assertions.assertEquals("test title2", response.getBody().get(1).getTitle());
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
     }

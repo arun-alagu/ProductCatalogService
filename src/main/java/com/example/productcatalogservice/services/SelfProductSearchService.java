@@ -12,7 +12,7 @@ import java.util.List;
 public class SelfProductSearchService implements IProductSearchService {
     private final ProductRepository productRepository;
 
-    SelfProductSearchService(ProductRepository productRepository) {
+    public SelfProductSearchService(ProductRepository productRepository) {
         this.productRepository = productRepository;
     }
 

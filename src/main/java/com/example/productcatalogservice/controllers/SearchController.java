@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/search")
+@RequestMapping("products/search")
 public class SearchController {
     private final IProductSearchService selfProductSearchService;
 
@@ -24,9 +24,9 @@ public class SearchController {
 
     @GetMapping
     public ResponseEntity<List<ProductResponseDto>> search(
-            @RequestParam("keyword") String keyword,
-            @RequestParam(value = "pageNumber", defaultValue = "0") int pageNumber,
-            @RequestParam(value = "pageSize", defaultValue = "1") int pageSize
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "0") int pageNumber,
+            @RequestParam(defaultValue = "1") int pageSize
     ) {
         List<Product> resultProducts = selfProductSearchService.searchProducts(
                 keyword, pageNumber, pageSize

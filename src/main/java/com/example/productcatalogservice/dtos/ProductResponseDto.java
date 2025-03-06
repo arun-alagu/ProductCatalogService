@@ -5,6 +5,7 @@ import com.example.productcatalogservice.models.Rating;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +18,7 @@ public class ProductResponseDto {
     private String description;
     private Double price;
     private String imageUrl;
-    private CategoryResponseDto category;
+    private List<CategoryResponseDto> categories = new ArrayList<>();
     private RatingResponseDto rating;
 
     public static ProductResponseDto getProductResponseDto(Product product){
@@ -29,19 +30,21 @@ public class ProductResponseDto {
         Optional.ofNullable(product.getPrice()).ifPresent(productResponseDto::setPrice);
         Optional.ofNullable(product.getImageUrl()).ifPresent(productResponseDto::setImageUrl);
 
-        Optional.ofNullable(product.getCategory()).ifPresent(category -> {
-            CategoryResponseDto categoryResponseDto = new CategoryResponseDto();
-            Optional.ofNullable(category.getId()).ifPresent(categoryResponseDto::setId);
-            Optional.ofNullable(category.getName()).ifPresent(categoryResponseDto::setName);
-            productResponseDto.setCategory(categoryResponseDto);
+        Optional.ofNullable(product.getCategories()).ifPresent((categories)->{
+        	categories.forEach(category -> {
+        		CategoryResponseDto categoryResponseDto = new CategoryResponseDto();
+                Optional.ofNullable(category.getId()).ifPresent(categoryResponseDto::setId);
+                Optional.ofNullable(category.getName()).ifPresent(categoryResponseDto::setName);
+                productResponseDto.categories.add(categoryResponseDto);
+        	});
         });
 
-        Optional.ofNullable(product.getRating()).ifPresent(rating -> {
-                RatingResponseDto ratingResponseDto = new RatingResponseDto();
-                Optional.ofNullable(rating.getRate()).ifPresent(ratingResponseDto::setRate);
-                Optional.ofNullable(rating.getCount()).ifPresent(ratingResponseDto::setCount);
-            productResponseDto.setRating(ratingResponseDto);
-        });
+//        Optional.ofNullable(product.getRating()).ifPresent(rating -> {
+//                RatingResponseDto ratingResponseDto = new RatingResponseDto();
+//                Optional.ofNullable(rating.getRate()).ifPresent(ratingResponseDto::setRate);
+//                Optional.ofNullable(rating.getCount()).ifPresent(ratingResponseDto::setCount);
+//            productResponseDto.setRating(ratingResponseDto);
+//        });
 
         return productResponseDto;
     }

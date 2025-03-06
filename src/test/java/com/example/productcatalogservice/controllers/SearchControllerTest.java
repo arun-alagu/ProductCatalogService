@@ -3,7 +3,6 @@ package com.example.productcatalogservice.controllers;
 import com.example.productcatalogservice.dtos.ProductResponseDto;
 import com.example.productcatalogservice.models.Product;
 import com.example.productcatalogservice.services.IProductSearchService;
-import io.github.cdimascio.dotenv.Dotenv;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -25,11 +24,11 @@ import static org.mockito.Mockito.when;
 class SearchControllerTest {
     @BeforeAll
     public static void setup() { // Load .env file before tests run
-        Dotenv dotenv = Dotenv.configure().load(); // This will load the .env file
-        System.setProperty("DB_URL", dotenv.get("DB_URL"));
-        System.setProperty("DB_NAME", dotenv.get("DB_NAME"));
-        System.setProperty("DB_USERNAME", dotenv.get("DB_USERNAME"));
-        System.setProperty("DB_PASSWORD", dotenv.get("DB_PASSWORD"));
+//        Dotenv dotenv = Dotenv.configure().load(); // This will load the .env file
+//        System.setProperty("DB_URL", dotenv.get("DB_URL"));
+//        System.setProperty("DB_NAME", dotenv.get("DB_NAME"));
+//        System.setProperty("DB_USERNAME", dotenv.get("DB_USERNAME"));
+//        System.setProperty("DB_PASSWORD", dotenv.get("DB_PASSWORD"));
     }
 
     @Autowired
@@ -62,8 +61,8 @@ class SearchControllerTest {
         Assertions.assertNotNull(productResponseDtos.getBody());
         Assertions.assertEquals(products.size(), productResponseDtos.getBody().size());
         Assertions.assertEquals(2, products.size());
-        Assertions.assertEquals(products.get(0).getTitle(),
-                productResponseDtos.getBody().get(0).getTitle());
+        Assertions.assertEquals(products.getFirst().getTitle(),
+                productResponseDtos.getBody().getFirst().getTitle());
 
     }
 
@@ -96,8 +95,8 @@ class SearchControllerTest {
 
         Assertions.assertNotNull(productResponseDtoList.getBody());
         Assertions.assertEquals(products.size(), productResponseDtoList.getBody().size());
-        Assertions.assertEquals(products.get(0).getTitle(),
-                productResponseDtoList.getBody().get(0).getTitle());
+        Assertions.assertEquals(products.getFirst().getTitle(),
+                productResponseDtoList.getBody().getFirst().getTitle());
 
 
     }

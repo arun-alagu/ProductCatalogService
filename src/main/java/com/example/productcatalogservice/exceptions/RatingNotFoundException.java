@@ -5,9 +5,9 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ProductNotFoundException extends Exception{
-
-    public ProductNotFoundException(String message) {
+public class RatingNotFoundException extends Exception{
+	
+    public RatingNotFoundException(String message) {
         super(message);
     }
 }

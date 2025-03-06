@@ -10,14 +10,14 @@ import java.util.List;
 @Configuration
 public class RedisConfig {
     @Bean
-    public RedisTemplate<String, Object> redisTemplateObject(RedisConnectionFactory redisConnectionFactory) {
+    RedisTemplate<String, Object> redisTemplateObject(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, Object> object = new RedisTemplate<>();
         object.setConnectionFactory(redisConnectionFactory);
         return object;
     }
 
     @Bean
-    public RedisTemplate<String, List<Object>> redisTemplateObjects(RedisConnectionFactory redisConnectionFactory) {
+    RedisTemplate<String, List<Object>> redisTemplateObjects(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, List<Object>> objects = new RedisTemplate<>();
         objects.setConnectionFactory(redisConnectionFactory);
         return objects;

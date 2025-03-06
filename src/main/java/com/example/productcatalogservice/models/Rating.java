@@ -8,10 +8,10 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Entity
+@Entity(name = "ratings")
 public class Rating extends BaseModel{
-    private Float rate;
-    private Integer count;
-    @OneToOne
+    private Float rate = 0f;
+    private Integer count = 0;
+    @OneToOne(mappedBy = "rating")
     private Product product;
 }

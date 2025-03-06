@@ -20,14 +20,14 @@ public class SecurityConfig {
 //    }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
-                .cors(AbstractHttpConfigurer::disable)
-                .csrf(AbstractHttpConfigurer::disable)
+//                .cors(AbstractHttpConfigurer::disable)
+//                .csrf(AbstractHttpConfigurer::disable)
 //                .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests((requests) -> {
-//                    requests.anyRequest().permitAll();
-                    requests.anyRequest().authenticated();
+                    requests.anyRequest().permitAll();
+//                    requests.anyRequest().authenticated();
                 })
                 .oauth2ResourceServer(
                         oauth2 -> oauth2.jwt(Customizer.withDefaults()))

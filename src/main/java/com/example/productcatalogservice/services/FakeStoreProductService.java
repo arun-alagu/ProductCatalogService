@@ -2,6 +2,7 @@ package com.example.productcatalogservice.services;
 
 import com.example.productcatalogservice.clients.FakeStoreClient;
 import com.example.productcatalogservice.dtos.*;
+import com.example.productcatalogservice.exceptions.ProductNotFoundException;
 import com.example.productcatalogservice.models.Category;
 import com.example.productcatalogservice.models.Product;
 import com.example.productcatalogservice.models.Rating;
@@ -95,7 +96,7 @@ public class FakeStoreProductService implements IProductService {
                 .ifPresent(categoryName -> {
             Category category = new Category();
             category.setName(categoryName);
-            product.setCategory(category);
+            product.getCategories().add(category);
         });
 
         Optional.ofNullable(fakeStoreProductResponseDto.getRating())
@@ -122,12 +123,20 @@ public class FakeStoreProductService implements IProductService {
         Optional.ofNullable(product.getImageUrl())
                 .ifPresent(fakeStoreProductRequestDto::setImage);
 
-        Optional.ofNullable(product.getCategory()).flatMap(
-                category -> Optional.ofNullable(category.getName()))
-                .ifPresent(fakeStoreProductRequestDto::setCategory);
+        Optional.ofNullable(product.getCategories()).ifPresent(categories -> {
+        	categories.forEach(category -> {
+        		product.getCategories().add(category);
+        	});
+        });
 
         return fakeStoreProductRequestDto;
     }
+
+	@Override
+	public List<Product> addProducts(List<Product> products) throws ProductNotFoundException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 
 

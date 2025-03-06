@@ -1,7 +1,8 @@
 package com.example.productcatalogservice.dtos;
 
-import com.example.productcatalogservice.models.Category;
 import com.example.productcatalogservice.models.Product;
+import com.example.productcatalogservice.models.Rating;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,7 +15,6 @@ public class ProductRequestDto {
     private Double price;
     private String description;
     private String imageUrl;
-    private CategoryRequestDto category;
 
     public static Product getProduct(ProductRequestDto productRequestDto){
         Product product = new Product();
@@ -23,13 +23,8 @@ public class ProductRequestDto {
         Optional.ofNullable(productRequestDto.getPrice()).ifPresent(product::setPrice);
         Optional.ofNullable(productRequestDto.getDescription()).ifPresent(product::setDescription);
         Optional.ofNullable(productRequestDto.getImageUrl()).ifPresent(product::setImageUrl);
-
-        Optional.ofNullable(productRequestDto.getCategory()).ifPresent(categoryRequestDto -> {
-            Category category = new Category();
-            Optional.ofNullable(categoryRequestDto.getName()).ifPresent(category::setName);
-            Optional.ofNullable(categoryRequestDto.getDescription()).ifPresent(category::setDescription);
-            product.setCategory(category);
-        });
+        Rating rating = new Rating();
+        product.setRating(rating);
 
         return product;
     }
