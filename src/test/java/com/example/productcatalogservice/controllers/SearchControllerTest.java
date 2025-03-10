@@ -3,7 +3,6 @@ package com.example.productcatalogservice.controllers;
 import com.example.productcatalogservice.dtos.ProductResponseDto;
 import com.example.productcatalogservice.models.Product;
 import com.example.productcatalogservice.services.IProductSearchService;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -17,13 +16,14 @@ import org.springframework.web.client.RestTemplate;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
 class SearchControllerTest {
     @BeforeAll
-    public static void setup() { // Load .env file before tests run
+    static void setup() { // Load .env file before tests run
 //        Dotenv dotenv = Dotenv.configure().load(); // This will load the .env file
 //        System.setProperty("DB_URL", dotenv.get("DB_URL"));
 //        System.setProperty("DB_NAME", dotenv.get("DB_NAME"));
@@ -57,11 +57,11 @@ class SearchControllerTest {
         ResponseEntity<List<ProductResponseDto>> productResponseDtos = searchController.search(
                 "Product", 0, 1);
 
-        Assertions.assertNotNull(products);
-        Assertions.assertNotNull(productResponseDtos.getBody());
-        Assertions.assertEquals(products.size(), productResponseDtos.getBody().size());
-        Assertions.assertEquals(2, products.size());
-        Assertions.assertEquals(products.getFirst().getTitle(),
+        assertNotNull(products);
+        assertNotNull(productResponseDtos.getBody());
+        assertEquals(products.size(), productResponseDtos.getBody().size());
+        assertEquals(2, products.size());
+        assertEquals(products.getFirst().getTitle(),
                 productResponseDtos.getBody().getFirst().getTitle());
 
     }
@@ -93,9 +93,9 @@ class SearchControllerTest {
         restTemplate.getForEntity("http://localhost:8080/search?keyword=Product",
                 ProductResponseDtoList.class);
 
-        Assertions.assertNotNull(productResponseDtoList.getBody());
-        Assertions.assertEquals(products.size(), productResponseDtoList.getBody().size());
-        Assertions.assertEquals(products.getFirst().getTitle(),
+        assertNotNull(productResponseDtoList.getBody());
+        assertEquals(products.size(), productResponseDtoList.getBody().size());
+        assertEquals(products.getFirst().getTitle(),
                 productResponseDtoList.getBody().getFirst().getTitle());
 
 

@@ -21,7 +21,7 @@ public class Product extends BaseModel implements Serializable {
     private String description;
     private Double price;
     private String imageUrl;
-    @ManyToMany(cascade = CascadeType.DETACH)
+    @ManyToMany(cascade = CascadeType.DETACH, fetch = FetchType.EAGER)
     @JoinTable(
             name = "product_category",  // name of the join table
             joinColumns = @JoinColumn(name = "product_id"),  // foreign key for product

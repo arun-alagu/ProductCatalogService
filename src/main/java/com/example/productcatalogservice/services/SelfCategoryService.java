@@ -5,6 +5,7 @@ import com.example.productcatalogservice.models.Category;
 import com.example.productcatalogservice.repositories.CategoryRepository;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +24,7 @@ public class SelfCategoryService implements ICategoryService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Category getCategoryById(Long categoryId) throws CategoryNotFoundException {
     	
         return categoryRepository.findById(categoryId).orElseThrow(()->

@@ -2,6 +2,7 @@ package com.example.productcatalogservice.models;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToMany;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,6 +18,6 @@ import java.util.Set;
 public class Category extends BaseModel{
     private String name;
     private String description;
-    @ManyToMany(mappedBy = "categories", cascade = CascadeType.DETACH)
+    @ManyToMany(mappedBy = "categories", cascade = CascadeType.DETACH, fetch = FetchType.EAGER)
     private Set<Product> products = new HashSet<>();
 }

@@ -8,7 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 class ProductCatalogServiceApplicationTests {
 
     @BeforeAll
-    public static void setup() {
+    static void setup() {
 //        Dotenv dotenv = Dotenv.configure().load(); // This will load the .env file
 //        System.setProperty("DB_URL", dotenv.get("DB_URL"));
 //        System.setProperty("DB_NAME", dotenv.get("DB_NAME"));

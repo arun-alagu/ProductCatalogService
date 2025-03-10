@@ -3,6 +3,7 @@ package com.example.productcatalogservice.services;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.productcatalogservice.exceptions.RatingNotFoundException;
 import com.example.productcatalogservice.models.Product;
@@ -19,6 +20,7 @@ public class SelfRatingService implements IRatingService{
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public Rating getRatingById(Long ratingId) throws RatingNotFoundException {
 		if(ratingId == null) throw new IllegalArgumentException("Rating id cannot be empty");
 		return ratingRepository.findById(ratingId).orElseThrow(()-> 

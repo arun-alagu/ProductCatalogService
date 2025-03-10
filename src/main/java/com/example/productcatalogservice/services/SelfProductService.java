@@ -8,6 +8,7 @@ import com.example.productcatalogservice.repositories.ProductRepository;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +47,7 @@ public class SelfProductService implements  IProductService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Product getProductById(Long productId) throws ProductNotFoundException {
 //        return productRepository.findById(productId)
 //                .orElseThrow(()-> new ProductNotFoundException(productId ,"Product not found"));

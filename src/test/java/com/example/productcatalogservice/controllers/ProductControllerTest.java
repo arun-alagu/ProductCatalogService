@@ -9,7 +9,6 @@ import com.example.productcatalogservice.models.Product;
 import com.example.productcatalogservice.models.Rating;
 import com.example.productcatalogservice.models.State;
 import com.example.productcatalogservice.services.IProductService;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -24,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -31,8 +31,8 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 class ProductControllerTest {
 
-    @BeforeAll
-    public static void setup() { // Load .env file before tests run
+    /*~~(org/openrewrite/staticanalysis/LambdaBlockToExpression)~~>*/@BeforeAll
+    static void setup() { // Load .env file before tests run
 //        Dotenv dotenv = Dotenv.configure().load(); // This will load the .env file
 //        System.setProperty("DB_URL", dotenv.get("DB_URL"));
 //        System.setProperty("DB_NAME", dotenv.get("DB_NAME"));
@@ -78,14 +78,14 @@ class ProductControllerTest {
         ResponseEntity<ProductResponseDto> response = productController.getProductById(1L);
 
         //Assert
-        Assertions.assertNotNull(response);
-        Assertions.assertNotNull(response.getBody());
-        Assertions.assertEquals("Test Product", response.getBody().getTitle());
-        Assertions.assertEquals("Test Product Description", response.getBody().getDescription());
-        Assertions.assertEquals(1L, response.getBody().getId());
+        assertNotNull(response);
+        assertNotNull(response.getBody());
+        assertEquals("Test Product", response.getBody().getTitle());
+        assertEquals("Test Product Description", response.getBody().getDescription());
+        assertEquals(1L, response.getBody().getId());
 //        Assertions.assertEquals(2, response.getBody().getRating().size());
-        Assertions.assertEquals("Test Category", response.getBody().getCategories().get(0).getName());
-        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Test Category", response.getBody().getCategories().getFirst().getName());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
 
     }
 
@@ -96,13 +96,13 @@ class ProductControllerTest {
 
         ResponseEntity<ProductResponseDto> response = productController.getProductById(1L);
 
-        Assertions.assertNotNull(response);
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertNotNull(response);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
     @Test
     void givenInvalidProductId_whenGetValidProduct_thenThrowException() {
-        Assertions.assertThrows(IllegalArgumentException.class,
+        assertThrows(IllegalArgumentException.class,
                 () -> productController.getProductById(0L));
     }
 
@@ -124,12 +124,12 @@ class ProductControllerTest {
         ResponseEntity<List<ProductResponseDto>> response = productController.getAllProducts();
 
         // Assert
-        Assertions.assertNotNull(response);
-        Assertions.assertNotNull(response.getBody());
-        Assertions.assertEquals(products.size(), response.getBody().size());
-        Assertions.assertEquals("test title1",response.getBody().getFirst().getTitle());
-        Assertions.assertEquals("test title2", response.getBody().get(1).getTitle());
-        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response);
+        assertNotNull(response.getBody());
+        assertEquals(products.size(), response.getBody().size());
+        assertEquals("test title1",response.getBody().getFirst().getTitle());
+        assertEquals("test title2", response.getBody().get(1).getTitle());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
     @Test
@@ -152,17 +152,17 @@ class ProductControllerTest {
         ResponseEntity<ProductResponseDto> response = productController.addProduct(dto);
 
         // Assert
-        Assertions.assertNotNull(response);
-        Assertions.assertNotNull(response.getBody());
-        Assertions.assertEquals(1L, response.getBody().getId());
-        Assertions.assertEquals("test title", response.getBody().getTitle());
-        Assertions.assertEquals("description", response.getBody().getDescription());
-        Assertions.assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertNotNull(response);
+        assertNotNull(response.getBody());
+        assertEquals(1L, response.getBody().getId());
+        assertEquals("test title", response.getBody().getTitle());
+        assertEquals("description", response.getBody().getDescription());
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
     }
 
     @Test
     void whenAddProductInvalidProductRequest_thenThrowException() {
-        Assertions.assertThrows(IllegalArgumentException.class,
+        assertThrows(IllegalArgumentException.class,
                 () -> productController.addProduct(null));
     }
 
@@ -183,12 +183,12 @@ class ProductControllerTest {
                 .thenReturn(updatedProduct);
 
         ResponseEntity<ProductResponseDto> response = productController.updateProductById(dto, 1L);
-        Assertions.assertNotNull(response);
-        Assertions.assertNotNull(response.getBody());
-        Assertions.assertEquals(1L, response.getBody().getId());
-        Assertions.assertEquals("new title", response.getBody().getTitle());
-        Assertions.assertEquals("description", response.getBody().getDescription());
-        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response);
+        assertNotNull(response.getBody());
+        assertEquals(1L, response.getBody().getId());
+        assertEquals("new title", response.getBody().getTitle());
+        assertEquals("description", response.getBody().getDescription());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
 
     }
 
@@ -196,7 +196,7 @@ class ProductControllerTest {
     @Test
     void givenValidProductIdAndInvalidProductRequest_whenUpdateProduct_thenThrowException() {
 
-        Assertions.assertThrows(IllegalArgumentException.class,
+        assertThrows(IllegalArgumentException.class,
                 () -> productController.updateProductById(null, 1L));
     }
 
@@ -216,13 +216,13 @@ class ProductControllerTest {
         ResponseEntity<ProductResponseDto> response = productController.removeProductById(1L);
 
         // Assert
-        Assertions.assertNotNull(response);
-        Assertions.assertNotNull(response.getBody());
-        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
-        Assertions.assertEquals("test title", response.getBody().getTitle());
-        Assertions.assertEquals("description", response.getBody().getDescription());
-        Assertions.assertEquals(1L, response.getBody().getId());
-        Assertions.assertEquals(ProductResponseDto.class, response.getBody().getClass());
+        assertNotNull(response);
+        assertNotNull(response.getBody());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("test title", response.getBody().getTitle());
+        assertEquals("description", response.getBody().getDescription());
+        assertEquals(1L, response.getBody().getId());
+        assertEquals(ProductResponseDto.class, response.getBody().getClass());
 
     }
 
